@@ -48,5 +48,6 @@ while True:
         continue
       callAPI (cmd)
     except:
+      print "Something went wrong."
       break
 # CODE END
