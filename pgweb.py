@@ -11,6 +11,8 @@ def signal_handler(sig, frame):
         sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
+isExtended = False
+
 cookies = {
     COOKIE_KEY: COOKIE_VALUE,
 }
@@ -25,7 +27,23 @@ def callAPI (input):
   if 'error' in data.keys():
     print data["error"]
   else:
-    print tabulate(data["rows"], headers=data["columns"], tablefmt='orgtbl')
+    if not isExtended :
+      print tabulate(data["rows"], headers=data["columns"], tablefmt='psql')
+    else :
+      makeExtendedJSON(data)
+
+
+def makeExtendedJSON (data):
+  for i in range(len(data["rows"])):
+    extendedData = []
+    print "--------------------Row " + str((i+1))+ "-------------------------"
+    for col in data["columns"]:
+      index = data["columns"].index(col)
+      d = data["rows"][i]
+      value = [col,d[index]]
+      extendedData.append(value)
+    print tabulate(extendedData, tablefmt='psql')
+
 
 try:
   line = raw_input()
@@ -43,11 +61,17 @@ while True:
       if (cmd == "c" or cmd == "clear" ):
         _ = system('clear')
         continue
+      if (cmd == "x" or cmd == "extend") :
+          isExtended = not isExtended
+          if isExtended :
+            print "Expanded display is on."
+          else :
+            print "Expanded display is off."
+          continue
       if cmd == "h" or cmd == "help" :
         print "press c to clear screen, q to quit or pass the sql query."
         continue
       callAPI (cmd)
     except:
-      print "Something went wrong."
       break
 # CODE END
