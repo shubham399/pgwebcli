@@ -6,7 +6,8 @@ A cli tool for pg-web which uses the query api to make the SQL querys.
 
 1) Need to have python2.7.
 2) Install the `requirements.txt` using `pip install -r requirements.txt`
-3) Fillout `PG_WEB_URL`,`COOKIE_KEY` and `COOKIE_VALUE`. which you can extact from the pg-web in a web browser.
+3) SET enviroment variable `PG_WEB_URL`,`COOKIE_KEY` and `COOKIE_VALUE`. 
+  which you have to extract from the pg-web in a web browser.
 
 # How to Use.
 
