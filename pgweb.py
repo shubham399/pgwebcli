@@ -1,5 +1,6 @@
 import requests
-import json, sys,readline,signal ,select,os
+import json, sys,readline,signal,select,os
+from os import system
 from tabulate import tabulate
 
 # SET ENV FOR THESE
