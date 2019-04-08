@@ -1,7 +1,8 @@
 # EDIT THESE BEFORE USE
-PG_WEB_URL=""
-COOKIE_KEY=""
-COOKIE_VALUE=""
+import os
+PG_WEB_URL= os.getenv('PG_WEB_URL', 'https://localhost')
+COOKIE_KEY = os.getenv('COOKIE_KEY','COOKIE_KEY')
+COOKIE_VALUE = os.getenv('COOKIE_VALUE','COOKIE_VALUE')
 # CODE BEGIN
 from os import system
 import requests
@@ -11,7 +12,7 @@ def signal_handler(sig, frame):
         sys.exit(0)
 signal.signal(signal.SIGINT, signal_handler)
 
-isExtended = False
+isExpanded = False
 
 cookies = {
     COOKIE_KEY: COOKIE_VALUE,
@@ -20,6 +21,7 @@ cookies = {
 headers = {
     'cache-control': 'no-cache',
 }
+
 def callAPI (input):
   data = { 'query' : input}
   response = requests.post(PG_WEB_URL+'/api/query', headers=headers, cookies=cookies, data=data)
@@ -27,11 +29,10 @@ def callAPI (input):
   if 'error' in data.keys():
     print data["error"]
   else:
-    if not isExtended :
+    if not isExpanded :
       print tabulate(data["rows"], headers=data["columns"], tablefmt='psql')
     else :
       makeExtendedJSON(data)
-
 
 def makeExtendedJSON (data):
   for i in range(len(data["rows"])):
@@ -44,7 +45,6 @@ def makeExtendedJSON (data):
       extendedData.append(value)
     print tabulate(extendedData, tablefmt='psql')
 
-
 try:
   line = raw_input()
   if line != "":
@@ -53,6 +53,7 @@ try:
 except:
   sys.exit(1)
 
+print "USING HOST: " + str(PG_WEB_URL)
 while True:
     try:
       cmd = raw_input("pgweb# ").strip()
@@ -62,8 +63,8 @@ while True:
         _ = system('clear')
         continue
       if (cmd == "x" or cmd == "extend") :
-          isExtended = not isExtended
-          if isExtended :
+          isExpanded = not isExpanded
+          if isExpanded :
             print "Expanded display is on."
           else :
             print "Expanded display is off."
