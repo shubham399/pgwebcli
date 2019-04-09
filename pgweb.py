@@ -7,8 +7,12 @@ from tabulate import tabulate
 PG_WEB_URL= os.getenv('PG_WEB_URL', 'https://localhost')
 COOKIE_KEY = os.getenv('COOKIE_KEY','COOKIE_KEY')
 COOKIE_VALUE = os.getenv('COOKIE_VALUE','COOKIE_VALUE')
-schema = ""
+
 # CODE BEGIN
+schema = ""
+script_dir = os.path.dirname(__file__)
+rel_path = "data/savedQueries"
+savedqueryFile = os.path.join(script_dir, rel_path)
 isExpanded = False
 cookies = {
     COOKIE_KEY: COOKIE_VALUE,
@@ -46,13 +50,31 @@ def getShell():
       break
 
 def commandHandler(cmd):
-  command = cmd.split(" ")
+  command = cmd.split(" ",1)
   if command[0] == "" : return 0
-  if (command[0] == "\\q" or command[0] == "quit") : return 1
-  if (command[0] == "\\c" or command[0] == "clear" ):
+  if (command[0] == "\\q") : return 1
+  if (command[0] == "\\c" ):
     _ = system('clear')
     return 0
-  if (command[0] == "\\x" or command[0] == "extend") :
+  if (command[0] == "\\l"):
+    listSaveQueries()
+    return 0;
+  if (command[0] == "\\s") :
+    if(len(command) == 2):
+      savedQuery(command[1])
+    else :
+      print "\\s <SQL Query>"
+    return 0;
+  if (command[0] == "\\e") :
+    if(len(command) == 2):
+        try:
+          executeQuery(int(command[1]))
+        except:
+          print "\\e <Query Index>"
+    else :
+      print "\\e <Query Index>"
+    return 0;
+  if (command[0] == "\\x") :
     global isExpanded
     isExpanded = not isExpanded
     if isExpanded :
@@ -60,7 +82,7 @@ def commandHandler(cmd):
     else :
       print "Expanded display is off."
     return 0
-  if command[0] == "\\h" or command[0] == "help" :
+  if command[0] == "\\h":
     print "press \\c to clear screen, \\q to quit, \\d to list tables \\d tablename to structure or pass the sql query."
     return 0
   if command[0] == "\\d":
@@ -127,6 +149,38 @@ def makeExtendedJSON (data):
       value = [col,d[index]]
       extendedData.append(value)
     print tabulate(extendedData, tablefmt='psql')
+
+
+# | Save Querys Related functions
+def listSaveQueries () :
+  global savedqueryFile
+  f = open(savedqueryFile,"r")
+  data = f.readlines()
+  f.close()
+  d = []
+  for i in data:
+    d.append([i])
+  print(tabulate(d,headers=["id","query"],tablefmt='psql', showindex="always"))
+
+def executeQuery(index) :
+  global savedqueryFile
+  try:
+    f = open(savedqueryFile,"r")
+    data = f.readlines()
+    query(data[index])
+  except:
+    print "Index not found."
+  finally:
+    f.close()
+
+def savedQuery (query):
+  print "query"
+  global savedqueryFile
+  f = open(savedqueryFile,"a")
+  print "FileOpening"
+  f.write(query)
+  print "File Writing"
+  f.close()
 
 
 def signal_handler(sig, frame):
