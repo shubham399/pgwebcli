@@ -167,6 +167,7 @@ def executeQuery(index) :
   try:
     f = open(savedqueryFile,"r")
     data = f.readlines()
+    print "Executing: "+str(data[index])
     query(data[index])
   except:
     print "Index not found."
@@ -174,12 +175,9 @@ def executeQuery(index) :
     f.close()
 
 def savedQuery (query):
-  print "query"
   global savedqueryFile
   f = open(savedqueryFile,"a")
-  print "FileOpening"
   f.write(query)
-  print "File Writing"
   f.close()
 
 
